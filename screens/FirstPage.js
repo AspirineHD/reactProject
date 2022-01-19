@@ -4,7 +4,7 @@ import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
 const FirstPage = ({navigation}) => {
     const [inputValue1, setInputValue1] = useState('');
   return (
-    <View style={styles.container}>
+    <View style = {styles.container}>
       <Text style={styles.heading}>React Native Pass Value From One Screen</Text>
       <Text style={styles.textStyle}>Please insert your name to pass it to second screen</Text>
       <TextInput
