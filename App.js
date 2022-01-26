@@ -1,43 +1,44 @@
-import React from 'react'
-import { View, Text } from 'react-native'
-
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-import HomeScreen from './screens/HomeScreen';
-import AboutScreen from './screens/AboutScreen';
-import FirstPage from './screens/FirstPage';
-import SecondPage from './screens/SecondPage';
+import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import FirstPage from './pages/FirstPage';
+import SecondPage from './pages/SecondPage';
+import ThirdPage from './pages/ThirdPage';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
     <NavigationContainer>
-     <Stack.Navigator initailRouteName='Home'
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: '#C45',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
-     >
+      <Stack.Navigator
+        initialRouteName='FirstPage'
+        screenOptions={{
+          //Set Header Color
+          headerStyle:{backgroundColor:'#5f9ea0'},
+          //Set Header Text Color
+          headerTintColor:'#fff',
+          //Set Header Test Style
+          headerTitleStyle:{fontWeight:'bold'}
+        }}
+      >
         <Stack.Screen
-        name="HomeScreen"
-        component={HomeScreen}
-        options={{title:'Home'}}
+          name='FirstPage'
+          component={FirstPage}
+          options={{title:'First Page'}}
         />
         <Stack.Screen
-        name="AboutScreen"
-        component={AboutScreen}
-        options={{title:'About'}}
+          name='SecondPage'
+          component={SecondPage}
+          options={{title:'Second Page'}}
+        />
+        <Stack.Screen
+          name='ThridPage'
+          component={ThirdPage}
+          options={{title:'Thrid Page'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
-export default App
+export default App;
