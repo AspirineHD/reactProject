@@ -9,7 +9,7 @@ const ThirdPage = ({navigation}) => {
             <View style={{flex:1, padding:15}}>
                 <View style={styles.container}>
                     <Text style={styles.textTopStyle}>
-                        This is the Thrid Page
+                        This is the Third Page
                     </Text>
                     <Button
                         title="GO TO FIRST PAGE"
