@@ -8,6 +8,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import FirstPage from './pages/FirstPage';
 import SecondPage from './pages/SecondPage';
 import ThirdPage from './pages/ThirdPage';
+import CustomSidebarMenu from './pages/CustomSidebarMenu';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -88,6 +89,7 @@ const App = () => {
             activeTintColor:'#e91263',
             itemStyle:{marginVertical:5}
           }}
+          drawerContent = {(props)=> <CustomSidebarMenu {...props}/>}
         >
           <Drawer.Screen 
             name='FirstPage' 
