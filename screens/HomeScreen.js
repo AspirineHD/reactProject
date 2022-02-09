@@ -28,7 +28,7 @@ const HomeScreen = ({navigation}) => {
           <Item
             title="register"
             iconName="person-add"
-            onPress={() => alert('ลงทะเบียน')}
+            onPress={() => navigation.navigate('Register')}
           />
         </HeaderButtons>
       ),  

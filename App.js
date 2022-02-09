@@ -10,6 +10,7 @@ import AboutScreen from './screens/AboutScreen';
 import ProductScreen from './screens/ProductScreen';
 import DetailScreen from './screens/DetailScreen';
 import MenuScreen from './screens/MenuScreen';
+import RegisterScreen from './screens/RegisterScreen';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -36,6 +37,11 @@ function HomeStack() {
         name="About"
         component={AboutScreen}
         options={{title: 'เกี่ยวกับเรา'}}
+      />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{title: 'ลงทะเบียน'}}
       />
     </Stack.Navigator>
   );
