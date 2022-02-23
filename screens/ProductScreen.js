@@ -7,6 +7,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { HeaderButtons, HeaderButton, Item } from 'react-navigation-header-buttons';
 import axios from 'axios';
 
+import { useFocusEffect } from '@react-navigation/native';
+
 const IoniconsHeaderButton = props => (
   <HeaderButton IconComponent={Ionicons} iconSize={23} {...props} />
 );
@@ -27,18 +29,51 @@ const ProductScreen = ({navigation}) => {
   }, [navigation]);
 
   const [product, setProduct] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  //useEffect จะทำงานเมื่อคลิกที่เมนูสินค้า
-  useEffect (()=>{
-      //getData() for get data from backend
-      const getData = async ()=>{
-          const res = await axios.get('https://api.codingthailand.com/api/course')
-          //alert(JSON.stringify(res.data.data)); //.data มาจากชื่อ Array ใน API
-          setProduct(res.data.data);
-      }
+  let cancelToken;
+  //getData() for get data from backend
+  const getData = async ()=> {
+    setLoading(true);
+    const res = await axios.get('https://api.codingthailand.com/api/course',{
+      cancelToken : cancelToken.token
+    });
+    //alert(JSON.stringify(res.data.data)); //.data มาจากชื่อ Array ใน API
+    setProduct(res.data.data);
+    setLoading(false);
+  }
 
+  //useEffect จะทำงานเมื่อคลิกที่เมนูสินค้า(แค่หนึ่งรอบเท่านั้น)
+  // useEffect (()=>{
+  //     getData();
+  // },[])
+
+  //ทุก ๆ ครั้งที่เข้าหน้า Product หรือ Focus ที่หน้า Product
+  //เราจะให้ไปดึงข้อมูลที่ Server ตลอดเวลา
+  useFocusEffect (
+    //useCallBack เอาไว้ Optimize ฟังชั่น เพื่อไม่ให้ re-render ของ child component
+    React.useCallback(()=>{
+      cancelToken = axios.CancelToken.source();
       getData();
-  },[])
+
+      return ()=>{
+        //alert('Exit: ProductScreen');
+        cancelToken.cancel();
+      }
+    },[])
+  );
+
+  if(loading===true){
+    return(
+      <View styles={styles.container}>
+        <ActivityIndicator color='blue' size='large'/>
+      </View>
+    )
+  }
+
+  const _onRefresh = ()=> {
+    getData();
+  }
 
   return (
     <View>
@@ -47,9 +82,17 @@ const ProductScreen = ({navigation}) => {
         data={ product }
         //keyExtractor คีย์หลัก
         keyExtractor={(item, index)=> item.id.toString()}
+        //pull to refresh ลากลงมาให้ดึงข้อมูลใหม่
+        onRefresh={_onRefresh} //เรียก Function
+        refreshing={loading} //ถ้า refreshing เป็น true คือจะรอให้ refresh data
         //renderItem สำหรับ render UX/UI ที่จะให้ User มองเห็น
         renderItem={({item})=>(
-            <ListItem thumbnail>
+            <ListItem thumbnail onPress={()=>{
+              navigation.navigate('Detail', {
+                id:item.id,
+                title:item.title //นำค่า title จาก backend ส่งให้ตัวแปร title เพื่อนำไปใช้ในเพจ DetailScreen
+              })
+            }}>
               <Left>
                 <Thumbnail square source={{ uri: item.picture }} />
               </Left>
