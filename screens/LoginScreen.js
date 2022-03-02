@@ -3,29 +3,60 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Container, Header, Content, Item, Input, Label, Button, Icon, Form } from 'native-base';
 
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Formik, Field } from 'formik';
 import * as Yup from 'yup';
+
+import { userStoreContext } from '../context/UserContext';
 
 const validateSchema = Yup.object().shape({
     email: Yup.string().email('รูปแบบอีเมล์ไม่ถูกต้่อง').required('กรุณากรอกอีเมลใหม่'),
     password: Yup.string().min(3,'รหัสผ่านต้อง 3 ตัวอักษรขึ้นไป').required('กรุณาป้อนรหัสผ่าน'),
   });
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
+
+    const userStore = React.useContext(userStoreContext);
+
     return (
         <Container>
           <Content padder>
           <Formik
+            initialValues={{
+                email: '',
+                password: '',
+            }}
             //เมื่อคลิกที่ปุ่มให้ทำงานส่วนนี้
             onSubmit={async(values, { setSubmitting }) => {
-              // same shape as initial values
-              //console.log(values);
-              //alert(JSON.stringify(values));
               try {
-                
-              } catch (error) { //ถ้าไม่สามารถบันทึกข้อมูลลง Server ได้ เช่น อีเมลซ้ำ
-                
+                const url = 'https://api.codingthailand.com/api/login';
+                const res = await axios.post(url,{
+                  email : values.email,
+                  password : values.password
+                });
+                //alert(JSON.stringify(res.data))
+                //เก็บ Token ลงเครื่อง
+                await AsyncStorage.setItem('@token', JSON.stringify(res.data));
+                //get profile >> ให้ดูใน Postman ก่อน
+                const urlProfile = 'https://api.codingthailand.com/api/profile';
+                const resProfile = await axios.get(urlProfile,{
+                  headers:{
+                        Authorization : 'Bearer '+ res.data.access_token
+                  }
+                });
+                //alert(JSON.stringify(resProfile.data.data.user));
+                //เก็บข้อมูล Profile ลง AsyncStorage
+                await AsyncStorage.setItem('@profile', JSON.stringify(resProfile.data.data.user));
+
+                //get and update profile by Context(Global State)
+                const profile = await AsyncStorage.getItem('@profile');
+                userStore.updateProfile(JSON.parse(profile));
+
+                alert('เข้าสู่ระบบเรียบร้อยแล้ว');
+                navigation.navigate('Home');
+              } catch (error) { //ถ้าใส่ข้อมูลไม่ถูกต้อง
+                alert(error.response.data.message)
               } finally { //ให้ปุ่มสามารถกลับมากดหรือคลิกได้อีก
                 setSubmitting(false)
               }

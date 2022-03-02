@@ -13,6 +13,8 @@ import MenuScreen from './screens/MenuScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import LoginScreen from './screens/LoginScreen';
 
+import UserStoreProvider from './context/UserContext';
+
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -83,15 +85,17 @@ function ProductStack(){
 
 function App (){
   return (
-    <NavigationContainer>
-      <Drawer.Navigator
-        initialRouteName='Home'
-        drawerPositon='left'
-        drawerContent={(props) => <MenuScreen {...props}/>}>
-        <Drawer.Screen name='HomeStack' component={HomeStack} />
-        <Drawer.Screen name='ProductStack' component={ProductStack} />
-      </Drawer.Navigator>
-    </NavigationContainer>
+    <UserStoreProvider>
+      <NavigationContainer>
+        <Drawer.Navigator
+          initialRouteName='Home'
+          drawerPositon='left'
+          drawerContent={(props) => <MenuScreen {...props}/>}>
+          <Drawer.Screen name='HomeStack' component={HomeStack} />
+          <Drawer.Screen name='ProductStack' component={ProductStack} />
+        </Drawer.Navigator>
+      </NavigationContainer>
+    </UserStoreProvider>
   );
 }
 
