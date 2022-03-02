@@ -13,7 +13,7 @@ const validateSchema = Yup.object().shape({
   password: Yup.string().min(3,'รหัสผ่านต้อง 3 ตัวอักษรขึ้นไป').required('กรุณาป้อนรหัสผ่าน'),
 });
 
-const RegisterScreen = () => {
+const RegisterScreen = ({navigation}) => {
   return (
     <Container>
       <Content padder>
@@ -26,14 +26,30 @@ const RegisterScreen = () => {
         }}
         validationSchema={validateSchema}
         //เมื่อคลิกที่ปุ่ม Register ให้ทำงานส่วนนี้
-        onSubmit={(values) => {
+        onSubmit={async(values, { setSubmitting }) => {
           // same shape as initial values
-          console.log(values);
+          //console.log(values);
+          //alert(JSON.stringify(values));
+          try {
+            const url = 'https://api.codingthailand.com/api/register';
+            const res = await axios.post(url,{
+              name : values.name,
+              email : values.email,
+              password : values.password
+            });
+            alert(res.data.message)
+            //กลับหน้าหลักถ้าทำงานได้แล้ว
+            navigation.navigate('Home');
+          } catch (error) { //ถ้าไม่สามารถบันทึกข้อมูลลง Server ได้ เช่น อีเมลซ้ำ
+            alert(error.response.data.errors.email[0])
+          } finally { //ให้ปุ่มสามารถกลับมากดหรือคลิกได้อีก
+            setSubmitting(false)
+          }
         }}
       >
         {/* errors ใช้สำหรับตรวจสอบ state (ถ้าผู้ใช้ไม่กรอกข้อมูลจะให้ error อะไรเกิดขึ้น) */}
         {/* touched เมื่อผู้ใช้ไปกดที่ name และเลื่อนเมาส์ออกไปด้านนอกช่อง input โดยไม่กรอกข้อมูล */}
-        {({ errors, touched, values, handleChange, handleBlur }) => ( 
+        {({ errors, touched, values, handleChange, handleBlur, handleSubmit, isSubmitting }) => ( 
           <Form>
           {/* กำหนดให้มีเส้นสีแดงถ้าผู้ใช้ไม่กรอกข้อมูลชื่อ */}
           <Item fixedLabel error={errors.name && touched.name?true:false}>
@@ -58,6 +74,7 @@ const RegisterScreen = () => {
               value={values.email}
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
+              keyboardType='email-address'
             />
             { errors.email && touched.email && <Icon name='close-circle'/> }
           </Item>
@@ -74,6 +91,8 @@ const RegisterScreen = () => {
               value={values.password}
               onChangeText={handleChange('password')}
               onBlur={handleBlur('password')}
+              keyboardType='number-pad' //ให้คีย์บอร์ดแสดงเฉพาะตัวเลข
+              secureTextEntry={true} //ให้กรอกข้อมูลแล้วจะเป็นจุด
             />
             { errors.password && touched.password && <Icon name='close-circle'/> }
           </Item>
@@ -84,7 +103,12 @@ const RegisterScreen = () => {
               </Item>
             )
           }
-          <Button block large style={{marginTop:30, backgroundColor:'#0096DA'}}>
+          <Button 
+            onPress = { handleSubmit } 
+            disabled = { isSubmitting } //เปิดปิดปุ่มการทำงาน
+            block large 
+            style={{marginTop:30, backgroundColor:'#0096DA'}}
+          >
             <Text style={{color:'white',fontSize:15,fontWeight:'bold'}}>ลงทะเบียน</Text>
           </Button>
         </Form>
